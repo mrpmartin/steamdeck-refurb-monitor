@@ -1,23 +1,17 @@
 import fetch from "node-fetch";
 
 const URL = "https://store.steampowered.com/sale/steamdeckrefurbished";
+const NTFY_TOPIC = "steamdeck-alert-paul";
 
 const res = await fetch(URL, {
   headers: { "User-Agent": "Mozilla/5.0" }
 });
 const text = await res.text();
 
-// Adjust keywords if needed
-const keywords = [
-  "Add to Cart",
-  "In Stock"
-];
-
-const found = keywords.some(k => text.includes(k));
-
-if (found) {
-  console.log("STOCK FOUND");
-  process.exit(1); // triggers notification
+if (text.includes("Add to Cart")) {
+  await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+    method: "POST",
+    body: "🔥 Steam Deck Refurbished IN STOCK!"
+  });
+  process.exit(1);
 }
-
-console.log("No stock yet");
